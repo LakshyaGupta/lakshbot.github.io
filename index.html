@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Prediction Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Stock Prediction Dashboard</h1>
+
+    <div class="form-section">
+      <h2>Upload Datasets</h2>
+      <input type="file" id="fileUpload" multiple>
+    </div>
+
+    <div class="form-section">
+      <h2>Select Datasets for Analysis</h2>
+      <div id="datasetOptions"></div>
+      <button onclick="selectAllDatasets()">Select All</button>
+    </div>
+
+    <div class="form-section">
+      <h2>Prediction Settings</h2>
+      <label for="timeStep">Time Steps:</label>
+      <input type="number" id="timeStep" value="60">
+      
+      <label for="predictionWeeks">Prediction Weeks:</label>
+      <input type="number" id="predictionWeeks" value="8">
+      
+      <button onclick="startPrediction()">Run Prediction</button>
+    </div>
+
+    <div id="chartSection">
+      <h2>Prediction Results</h2>
+      <canvas id="predictionChart"></canvas>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
