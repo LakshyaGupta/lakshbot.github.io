@@ -12,7 +12,10 @@
 
     <div class="form-section">
       <h2>Upload Datasets</h2>
-      <input type="file" id="fileUpload" multiple>
+      <form id="fileForm" enctype="multipart/form-data">
+        <input type="file" id="fileUpload" name="files" multiple>
+        <button type="button" onclick="uploadFiles()">Upload Files</button>
+      </form>
     </div>
 
     <div class="form-section">
@@ -29,7 +32,7 @@
       <label for="predictionWeeks">Prediction Weeks:</label>
       <input type="number" id="predictionWeeks" value="8">
       
-      <button onclick="startPrediction()">Run Prediction</button>
+      <button type="button" onclick="startPrediction()">Run Prediction</button>
     </div>
 
     <div id="chartSection">

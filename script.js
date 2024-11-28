@@ -1,23 +1,25 @@
-// Placeholder data for datasets
-const availableDatasets = ["SP500", "FEDFUNDS", "DJIA", "NASDAQCOM", "NASDAQ100", "GDPC1", "UNRATE", "DCOILWTICO", "DGS10", "M2V", "WM2NS"];
+const availableDatasets = [];
 let selectedDatasets = [];
 let chart;
 
-// Populate dataset selection options
-const datasetOptions = document.getElementById('datasetOptions');
-availableDatasets.forEach(dataset => {
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.value = dataset;
-  checkbox.onchange = () => handleDatasetSelection(dataset, checkbox.checked);
-  
-  const label = document.createElement('label');
-  label.innerText = dataset;
-  label.style.marginRight = '10px';
+// Populate dataset selection options dynamically
+function populateDatasetOptions(datasets) {
+  const datasetOptions = document.getElementById('datasetOptions');
+  datasetOptions.innerHTML = '';
+  datasets.forEach(dataset => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = dataset;
+    checkbox.onchange = () => handleDatasetSelection(dataset, checkbox.checked);
 
-  datasetOptions.appendChild(checkbox);
-  datasetOptions.appendChild(label);
-});
+    const label = document.createElement('label');
+    label.innerText = dataset;
+    label.style.marginRight = '10px';
+
+    datasetOptions.appendChild(checkbox);
+    datasetOptions.appendChild(label);
+  });
+}
 
 function handleDatasetSelection(dataset, isSelected) {
   if (isSelected) {
@@ -29,20 +31,45 @@ function handleDatasetSelection(dataset, isSelected) {
 
 function selectAllDatasets() {
   selectedDatasets = [...availableDatasets];
-  datasetOptions.querySelectorAll('input').forEach(checkbox => {
+  const checkboxes = document.getElementById('datasetOptions').querySelectorAll('input');
+  checkboxes.forEach(checkbox => {
     checkbox.checked = true;
   });
+}
+
+function uploadFiles() {
+  const formData = new FormData(document.getElementById('fileForm'));
+  fetch('http://localhost:5000/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    availableDatasets.push(...data.datasets);
+    populateDatasetOptions(availableDatasets);
+    alert('Files uploaded and datasets loaded.');
+  })
+  .catch(error => console.error('Error uploading files:', error));
 }
 
 function startPrediction() {
   const timeStep = document.getElementById('timeStep').value;
   const predictionWeeks = document.getElementById('predictionWeeks').value;
 
-  // Placeholder data for chart
-  const labels = Array.from({ length: predictionWeeks }, (_, i) => `Week ${i + 1}`);
-  const data = Array.from({ length: predictionWeeks }, () => Math.random() * 100);
-
-  updateChart(labels, data);
+  fetch('http://localhost:5000/predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      datasets: selectedDatasets,
+      timeStep: parseInt(timeStep),
+      predictionWeeks: parseInt(predictionWeeks)
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    updateChart(data.labels, data.predictedPrices);
+  })
+  .catch(error => console.error('Error during prediction:', error));
 }
 
 function updateChart(labels, data) {
@@ -66,17 +93,11 @@ function updateChart(labels, data) {
       scales: {
         x: {
           display: true,
-          title: {
-            display: true,
-            text: 'Weeks'
-          }
+          title: { display: true, text: 'Weeks' }
         },
         y: {
           display: true,
-          title: {
-            display: true,
-            text: 'Price'
-          }
+          title: { display: true, text: 'Price' }
         }
       }
     }
